@@ -10,7 +10,8 @@ function InfoBox({ title, cases, total }) {
         </Typography>
         <h2 className="infoBox__cases">
           {" "}
-          Today: {cases ? cases : "Error! Try after sometime"}
+          Today:{" "}
+          {cases ? cases : <span style={{ color: "tomato" }}>"Error!"</span>}
         </h2>
         <Typography className="infoBox__total" color="textSecondary">
           {total} Total

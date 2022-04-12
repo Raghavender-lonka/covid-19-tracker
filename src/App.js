@@ -20,6 +20,7 @@ function App() {
   const [countryInfo, setCountryInfo] = useState({})
   const [tableData, setTableData] = useState([])
   // const [casesType, setCasesType] = useState("cases");
+  const [countriesData, setCountriesData] = useState("India")
   const [tablePastData, setTablePastData] = useState([])
 
   useEffect(() => {
@@ -43,6 +44,7 @@ function App() {
           let sortedData = sortData(data)
           setTableData(sortedData)
           setCountries(countries)
+          // console.log(countries)
           // setMapCountries(data);
         })
     }
@@ -69,17 +71,33 @@ function App() {
       })
   }
   useEffect(() => {
-    fetch("https://disease.sh/v3/covid-19/jhucsse")
+    const onCountryDataChanget = async () => {
+      let tablePastData = []
+      await fetch("https://disease.sh/v3/covid-19/jhucsse")
+        .then((response) => response.json())
+        .then((data) => {
+          tablePastData = data.filter((stat) => {
+            return stat.country === "India"
+          })
+          setTablePastData(tablePastData)
+        })
+    }
+    onCountryDataChanget()
+  }, [])
+
+  const onCountryDataChange = async (e) => {
+    let countriesData = e.target.value
+    setCountriesData(e.target.value)
+    let tablePastData = []
+    await fetch("https://disease.sh/v3/covid-19/jhucsse")
       .then((response) => response.json())
       .then((data) => {
-        let tablePastData = data.filter((stat) => {
-          return stat.country === "India"
+        tablePastData = data.filter((stat) => {
+          return stat.country === countriesData
         })
-        // console.log(tablePastData)
         setTablePastData(tablePastData)
-        // console.log(tablePastData)
       })
-  }, [])
+  }
 
   return (
     <div className="app">
@@ -103,7 +121,7 @@ function App() {
         </div>
         <div className="app__stats">
           <InfoBox
-            title="Coronavirus Cases"
+            title="Live Cases"
             cases={countryInfo.todayCases}
             total={countryInfo.cases}
           ></InfoBox>
@@ -120,25 +138,33 @@ function App() {
             total={countryInfo.deaths}
           ></InfoBox>
         </div>
-        {/* <div className="embed-container">
-          <iframe
-            width="500"
-            height="400"
-            // frameborder="0"
-            scrolling="no"
-            marginHeight="0"
-            marginWidth="0"
-            title="COVID-19"
-            src="https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6"
-          ></iframe>
-        </div> */}
+
         <h6>
           Due to some issue with data sources, cann't get live feed from some
           countries, Thank you for Understanding
         </h6>
         <Card className="table--data">
           <CardContent>
-            <h3>India's Covid Cases</h3>
+            <div className="table--data__header">
+              <h2>Covid-19 Cases by states(or)provinces</h2>
+              <FormControl className="app__dropdown">
+                <Select
+                  variant="outlined"
+                  value={countriesData}
+                  onChange={onCountryDataChange}
+                  // onSelect={onCountryChange}
+                >
+                  <MenuItem value="India" selected>
+                    India
+                  </MenuItem>
+                  {countries.map((country) => (
+                    <MenuItem key={Math.random()} value={country.name}>
+                      {country.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
             <TableData countriesData={tablePastData}></TableData>
           </CardContent>
         </Card>
