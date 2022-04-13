@@ -93,9 +93,18 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         tablePastData = data.filter((stat) => {
-          return stat.country === countriesData
+          if (countriesData === "UK") {
+            return stat.country === "United Kingdom"
+          } else if (countriesData === "USA") {
+            return stat.country === "US"
+          } else {
+            return stat.country === countriesData
+          }
         })
         setTablePastData(tablePastData)
+        console.log(tablePastData)
+        console.log(countriesData)
+        console.log(data)
       })
   }
 
